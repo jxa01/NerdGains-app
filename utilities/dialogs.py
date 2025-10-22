@@ -51,7 +51,7 @@ class Dialogs:
 		auto_dismiss=False
 		)
 		logger = App.get_running_app().root.get_screen('logger')
-		recover.bind(on_release=lambda x: (logger.session_manafer.session_recovery(session_id), popup.dismiss()))
+		recover.bind(on_release=lambda x: (logger.session_manager.session_recovery(session_id), popup.dismiss()))
 		
 		abandon.bind(on_release=lambda x: (logger.session_manager.abandon_session(session_id), popup.dismiss()))
 		popup.open()

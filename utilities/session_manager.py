@@ -99,7 +99,7 @@ class SessionManager:
 		self.sessions_table_data,
 		where='session_id = ?',
 		where_params=[self.session_id])
-		self.wo_started = False
+		self.session_started = False
 		self.ng_config.finish_session()
 		
 	def abandon_session(self, session_id):
@@ -107,7 +107,7 @@ class SessionManager:
 		'sessions', 
 		where='session_id = ?', 
 		params=[session_id])
-		self.wo_started = False		
+		self.session_started = False		
 		self.session_id = 0
 		self.ng_config.abandon_session()
 		
@@ -126,9 +126,9 @@ class SessionManager:
 		self.recovery_mode = False				
 		App.get_running_app().root.current = 'logger'
 		
-	def recover_session_data(self, sessions_data, session_id):
+	def recover_sessions_data(self, sessions_data, session_id):
 		self.session_id = session_id
-		self.wo_started = True
+		self.session_started = True
 		self.sessions_table_data = sessions_data
 
 	#builds log widgets and adds them to logger from recovered data
