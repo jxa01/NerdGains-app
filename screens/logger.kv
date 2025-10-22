@@ -1,0 +1,50 @@
+<ContentBox@ScrollView>
+	do_scroll_x: False
+	do_scroll_y: True
+	BoxLayout:
+		id: container
+		orientation: 'vertical'
+		size_hint_y: None
+		height: self.minimum_height
+		spacing: dp(30)
+		padding: dp(5)
+					
+<Logger>:
+	canvas.before:
+		Color:
+			rgba: app.Colors['background']
+		Rectangle:
+			pos: self.pos
+			size: self.size
+				
+	BoxLayout:
+		orientation: 'vertical'
+		spacing: 20
+		
+		NavBar:			 
+			MyDropDown:
+				text: "navigation"
+				ddwidth: dp(140)
+				values: ("history",)	
+				on_select: root.page_select(*args)
+					
+			MyDropDown:
+				id: session_ctrl
+				text: "session contol"
+				ddwidth: dp(160)
+				values: ("Abandon", "Add Exercise", "Start Workout")
+				on_select: root.session_ctrl(*args)
+						
+		#in session dash board
+		BoxLayout:
+			orientation: 'horizontal'
+			spacing: 20
+			size_hint_y: None
+			height: self.minimum_height			
+			StopWatch:
+				id: timer
+				size_hint: (0.25, None)
+				height: app.Sizes['normal_line']			
+					
+		ContentBox:
+			id: content_box

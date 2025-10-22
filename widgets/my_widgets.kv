@@ -1,0 +1,119 @@
+<MyDropDownBase>:
+	auto_width: False
+	canvas.before:
+		Color:
+			rgba: [0, 1, 1, 0.33]
+		Rectangle:
+			pos: self.pos
+			size: self.size
+			
+<DropButton>:
+	background_normal: ""
+	background_down:""
+	background_color: [0, 0, 0, 0]
+	bg_color: app.Colors['primary']
+	color: app.Colors['primary_text']
+	markup: True
+	canvas.before:
+		#button background
+		Color:		
+			rgba: self.bg_color
+		RoundedRectangle:
+			radius: (30,)
+			pos: self.x+dp(5), self.y+dp(5)			
+			size: self.width - dp(10), self.height - dp(10)
+		 
+<NavBar>:
+	orientation: 'horizontal'
+	spacing: 10
+	padding: 10
+	size_hint_y: None
+	height: app.Sizes['title_line']
+	canvas.before:
+		Color:
+			rgba: app.Colors['surface']
+		Rectangle:
+			pos: self.pos
+			size: self.size		
+	Label:
+		text: root.bar_title
+		color: app.Colors['secondary']
+		markup: True
+		font_size: app.Sizes['title_font']
+		size_hint_x: None
+		width: self.texture_size[0]
+
+<MyButton@Button>:
+	background_normal: ""
+	background_down:""
+	background_color: [0, 0, 0, 0]
+	color: app.Colors['primary_text']
+	size_hint_y: None
+	height: app.Sizes['normal_line']
+	canvas.before:
+		Color:		
+			rgba: app.Colors['primary'] if self.state == 'normal' else app.Colors['primary_down']
+		RoundedRectangle:
+			radius: (35,)
+			pos: self.pos
+			size: self.size
+
+	
+<MySecondButton@MyButton>:
+	color: app.Colors['primary']
+	size_hint_y: None
+	height: app.Sizes['normal_line']
+	markup: True
+	canvas.before:
+		Color:		
+			rgba: app.Colors['secondary'] if self.state == 'normal' else app.Colors['secondary_down']
+		RoundedRectangle:
+			radius: (35,)
+			pos: self.pos
+			size: self.size
+
+<MyDeleteButton@MyButton>:
+	markup: True
+	background_color: app.Colors['delete/error'] if self.state == 'normal' else app.Colors['delete/error_down']
+	color: app.Colors['primary']
+			
+<MySpinner@Spinner>:
+	background_normal: ""
+	background_down:""
+	background_color: app.Colors['primary'] if self.state == 'normal' else app.Colors['primary_down']
+	color: app.Colors['primary_text']
+<SpinnerOption>:
+	background_normal: ""
+	background_down:""
+	background_color: app.Colors['primary']
+	color: app.Colors['primary_text']
+	
+<MyLabel@Label>:
+	color: app.Colors['primary_text']
+	size_hint_y: None
+	height: app.Sizes['normal_line']
+	#width: self.texture_size[0]
+	markup: True
+	
+<MyTextInput@TextInput>:
+	hint_text_color: app.Colors['disabled_text']
+	foreground_color: app.Colors['primary_text']
+	multiline: False
+	size_hint_y: None
+	height: app.Sizes['normal_line']
+	halign: 'center'
+	valign: 'middle'
+	background_color: [0, 1, 0, 0]
+	
+<SearchBar@TextInput>:
+	hint_text_color: app.Colors['surface']
+	foreground_color: app.Colors['primary_text']
+	multiline: False
+	background_color: app.Colors['primary']
+	padding_y: (self.height - self.line_height)/2
+	
+<MyToggleButton@ToggleButton>:
+	background_normal: ""
+	background_down:""
+	background_color: app.Colors['primary'] if self.state == 'normal' else app.Colors['secondary']
+	color: app.Colors['primary_text'] if self.state == 'normal' else app.Colors['primary']

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.buildozer/
+
+# OS
+.DS_Store

@@ -1,0 +1,77 @@
+<ExerciseSelector>:
+	canvas.before:
+		Color:
+			rgba: app.Colors['background']
+		Rectangle:
+			pos: self.pos
+			size: self.size
+						
+	#searchable list exercises of
+	BoxLayout:
+		orientation: 'vertical'
+		spacing: 20
+		padding: (0, dp(10), 0, dp(10))
+		
+		NavBar:
+			MyDropDown:
+				id: navigation
+				text: "navigation"
+				ddwidth: dp(130)
+				values: ("History", "Current Session", "Routines")
+				on_select: root.page_select(*args)
+				
+			MyDropDown:
+				text: "Filter"
+				ddwidth: dp(100)
+				values: ("all", "arms", "back", "cardio" , "chest", "core", "legs")
+			
+		
+		#search bar
+		AnchorLayout:
+			anchor_x: 'center'
+			anchor_y: 'top'
+			size_hint_y: None
+			height: app.Sizes['title_line']
+			BoxLayout:
+				canvas.before:
+					Color:
+						rgba: app.Colors['surface']
+					Rectangle:
+						pos: self.pos
+						size: self.size
+				MyLabel:
+					text: "Search:"
+					padding: dp(10)
+					size_hint_x: None
+					width: self.texture_size[0]
+					valign: 'middle'
+				SearchBar:
+					hint_text: "Exercise Name"
+					size_hint: (0.75, None)
+					height: app.Sizes['title_line']
+					font_size: app.Sizes['title_font']
+					on_text: root.search(self.text)
+				
+		#content box
+		RecycleView:
+			id: RV
+			viewclass: 'MyToggleButton'			
+			data: root.data
+			RecycleBoxLayout:
+				orientation: 'vertical'
+				spacing: 20
+				padding: 10
+				size_hint_y: None
+				height: self.minimum_height
+				default_size: None, app.Sizes['normal_line']
+				default_size_hint: 1, None
+		AnchorLayout:
+			anchor_x: 'center'
+			anchor_y: 'top'
+			size_hint_y: None
+			height: app.Sizes['normal_line']		
+			MySecondButton:
+				text: "[b]Add Exercises[/b]"
+				size_hint: (0.4, None)
+				height: app.Sizes['title_line']
+				on_release: root.post_exercises()

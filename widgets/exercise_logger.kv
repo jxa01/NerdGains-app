@@ -1,0 +1,145 @@
+<LogRow>:
+	orientation: 'horizontal'
+	size_hint_y: None
+	height: self.minimum_height
+	canvas.before:
+		Color:
+			rgba: app.Colors['surface']
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	
+	MyDropDown:
+		size_hint: (None, None)
+		height: app.Sizes['normal_line']
+		width: dp(90)
+		id: set_type
+		text: "Normal"
+		ddwidth: dp(100)
+		values: ("Normal", "drop set", 'RIR')
+		on_select: root.set_type_update(*args)		
+	#the set count number
+	MyLabel:
+		size_hint_x: None
+		width: dp(70)
+		padding: dp(10)
+		text: str(root.set_count)
+		text_size: (self.width, None)
+		halign: 'left'
+			
+	BoxLayout:
+		id: metric_inputs
+		orientation: 'horizontal'
+		size_hint_y: None
+		height: self.minimum_height
+		
+	ToggleButton:
+		id: submit_button
+		disabled: True
+		size_hint: (None, None)
+		size: (app.Sizes['normal_line'], app.Sizes['normal_line'])
+		text: "[b]+[/b]"
+		markup: True
+		
+		on_state: root.row_submit_btn(value=self.state)
+		
+		background_normal: ""
+		background_down:""
+		background_color: app.Colors['primary'] if self.state == 'normal' else app.Colors['secondary']
+		color: app.Colors['primary_text'] if self.state == 'normal' else app.Colors['primary']
+		
+		
+<ExerciseLog>
+	orientation: 'vertical'
+	size_hint_y: None
+	height: self.minimum_height
+	spacing: dp(5)
+			
+	#title row
+	BoxLayout:
+		orientation: 'horizontal'
+		size_hint_y: None
+		height: self.minimum_height
+		
+		#exercise name
+		NavBar:
+			bar_title: root.exercise_name
+			Widget:
+			MyDropDown:
+				text: "[b]...[/b]"
+				size_hint_x: None
+				width: dp(50)
+				values: ("Add Note", "Delete Excercise", "Edit Exercise", "View Stats")
+				on_select: root.log_ctrl(*args)
+				ddwidth: dp(150)				
+				
+	#cell names
+	BoxLayout:
+		size_hint_y: None
+		height: app.Sizes['normal_line']
+		canvas.before:
+			Color:
+				rgba: app.Colors['surface']
+			Rectangle:
+				pos: self.pos
+				size: self.size
+		BoxLayout:
+			id: title_row
+			orientation: 'horizontal'
+			size_hint_y: None
+			height: self.minimum_height
+			MyLabel:
+				text: "[b]Set Type[/b]"
+				size_hint_x: None
+				width: dp(90)
+				padding: dp(10)
+				halign: 'center'					
+			MyLabel:
+				text: "[b]Set Count[/b]"
+				size_hint_x: None
+				width: dp(70)
+				padding: dp(10)
+				halign: 'center'
+				text_size: (self.width, None)		
+		Widget:
+			size_hint_x: None
+			width:  app.Sizes['normal_line']
+			
+		#rows
+	BoxLayout:
+		orientation: 'vertical'
+		size_hint_y: None
+		height: self.minimum_height
+		id: rows
+		
+	#add and delete buttons
+	BoxLayout:
+		orientation: 'horizontal'
+		spacing: 20
+		size_hint_y: None
+		height: self.minimum_height
+		canvas.before:
+			Color:
+				rgba: app.Colors['surface']
+			Rectangle:
+				pos: self.pos
+				size: self.size
+						
+		Widget:
+			size_hint_y: None
+			height: dp(40)		
+		MyButton:
+			text: "add set"
+			size_hint: (None, None)
+			height: dp(40)
+			width: dp(100)
+			on_release: root.add_row(root.exe_log_id)
+		MyDeleteButton:
+			text: "[b]delete set[/b]"
+			size_hint: (None, None)
+			height: dp(40)
+			width: dp(100)
+			on_release: root.delete_row()
+		Widget:
+			size_hint_y: None
+			height: dp(40)

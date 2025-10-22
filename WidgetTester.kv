@@ -1,0 +1,133 @@
+<MyButton@Button>:
+	background_normal: ""
+	background_down:""
+	background_color: [0, 0, 0, 0]
+	color: app.Colors['primary_text']
+	canvas.before:
+		Color:		
+			rgba: app.Colors['primary'] if self.state == 'normal' else app.Colors['primary_down']
+		RoundedRectangle:
+			radius: (20,)
+			pos: self.pos
+			size: self.size
+	
+<MySecondButton@MyButton>:
+	background_color: app.Colors['secondary'] if self.state == 'normal' else app.Colors['secondary_down']
+	color: app.Colors['primary']
+	
+<MyDeleteButton@MyButton>:
+	markup: True
+	background_color: app.Colors['delete/error'] if self.state == 'normal' else app.Colors['delete/error_down']
+	color: app.Colors['primary']
+			
+<MySpinner@Spinner>:
+	background_normal: ""
+	background_down:""
+	background_color: app.Colors['primary'] if self.state == 'normal' else app.Colors['primary_down']
+	color: app.Colors['primary_text']
+<SpinnerOption>:
+	background_normal: ""
+	background_down:""
+	background_color: app.Colors['primary']
+	color: app.Colors['primary_text']
+	
+<MyLabel@Label>:
+	color: app.Colors['primary_text']
+	
+<MyTextInput@TextInput>:
+	hint_text_color: app.Colors['disabled_text']
+	foreground_color: app.Colors['primary_text']
+	halign: 'center'
+	multiline: False
+	background_color: [0, 0, 0, 0]
+	
+<SearchBar@TextInput>:
+	hint_text_color: app.Colors['disabled_text']
+	foreground_color: app.Colors['primary_text']
+	multiline: False
+	background_color: app.Colors['primary']
+	
+<MyToggleButton@ToggleButton>:
+	background_normal: ""
+	background_down:""
+	background_color: app.Colors['primary'] if self.state == 'normal' else app.Colors['secondary']
+	color: app.Colors['primary_text'] if self.state == 'normal' else app.Colors['primary']
+#test code above
+
+
+
+
+
+
+
+<ExerciseExplorer>:
+	canvas.before:
+		Color:
+			rgba: app.Colors['background']
+		Rectangle:
+			pos: self.pos
+			size: self.size
+						
+	BoxLayout:
+		orientation: 'vertical'
+		spacing: 20
+		#page title
+		AnchorLayout:
+			anchor_x: 'center'
+			anchor_y: 'top'
+			size_hint_y: None
+			height: app.Sizes['title_line']
+			MyLabel:
+				text: "[b]Exercise Explorer[/b]"
+				size_hint_y: None
+				height: app.Sizes['title_line']
+				markup: True
+				font_size: app.Sizes['title_font']
+				padding: 20
+				canvas.before:
+					Color:
+						rgba: app.Colors['primary']
+					Rectangle:
+						pos: self.pos
+						size: self.size
+				
+		#create new exercise button
+		AnchorLayout:
+			anchor_x: 'center'
+			anchor_y: 'top'
+			size_hint_y: None
+			height: app.Sizes['normal_line']
+			MyButton:
+				text: "Create New Exercise"
+				size_hint: (0.8, None)
+				height: app.Sizes['normal_line']
+						
+		#list of exercises to view						
+		RecycleView:
+			viewclass: 'Label'
+			data: root.data
+			RecycleBoxLayout:
+				orientation: 'vertical'
+				spacing: 20
+				padding: 10
+				size_hint_y: None
+				height: self.minimum_height
+				default_size: None, None
+				default_size_hint: 1, None
+				
+				
+		#bottom nav bar
+		AnchorLayout:
+			anchor_x: 'center'
+			anchor_y: 'top'
+			size_hint_y: None
+			height: app.Sizes['normal_line']				
+			MyButton:
+				text: "navigation"
+				size_hint: (0.8, None)
+				height: app.Sizes['normal_line']
+			
+#test code below
+		
+ExerciseExplorer:
+			

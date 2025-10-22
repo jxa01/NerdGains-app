@@ -1,0 +1,94 @@
+<WorkoutSummary>
+	orientation: 'vertical'
+	spacing: 20
+	padding: 20
+	size_hint_y: None
+	height: self.minimum_height
+	canvas.before:
+		Color:
+			rgba: app.Colors['surface']
+		RoundedRectangle: 
+			radius: (15,)
+			pos: self.pos
+			size: self.size
+						
+	#widget title
+	AnchorLayout:
+		anchor_x: 'center'
+		anchor_y: 'top'
+		size_hint_y: None
+		height: app.Sizes['title_line']
+		MyLabel:
+			text: root.workout_title
+			size_hint: (0.95, None)	
+			height: app.Sizes['title_line']
+			font_size: app.Sizes['normal_font']
+			padding: 20			
+			canvas.before:
+				Color:
+					rgba: app.Colors['primary']
+				RoundedRectangle:
+					radius: (15,)
+					pos: self.pos
+					size: self.size
+		
+	AnchorLayout:
+		anchor_x: 'center'
+		anchor_y: 'top'
+		size_hint_y: None
+		height: dp(80)								
+	#dashboard row
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (0.95, None)
+			height: self.minimum_height
+			spacing:10			
+			canvas.before:
+				Color:
+					rgba: app.Colors['primary']
+				RoundedRectangle:
+					radius: (15,)
+					pos: self.pos
+					size: self.size
+					
+			#duration
+			BoxLayout:
+				orientation: 'vertical'
+				size_hint_y: None
+				height: self.minimum_height
+				MyLabel:
+					text: "Duration:"
+					size_hint_y:  None
+					height: app.Sizes['normal_line']				
+				MyLabel:
+					text: root.duration
+					size_hint_y:  None
+					height: app.Sizes['normal_line']
+					
+				#volume
+			BoxLayout:
+				orientation: 'vertical'
+				size_hint_y: None
+				height: self.minimum_height
+				MyLabel:
+					text: "Volume:"
+					size_hint_y:  None
+					height: app.Sizes['normal_line']
+				MyLabel:
+					text: root.total_volume
+					size_hint_y:  None
+					height: app.Sizes['normal_line']
+					
+			#personal records
+			BoxLayout:
+				orientation: 'vertical'
+				size_hint_y: None
+				height: self.minimum_height
+				MyLabel:
+					text: "Intensity:"
+					size_hint_y:  None
+					height: app.Sizes['normal_line']
+				MyLabel:
+					text: root.intensity
+					size_hint_y:  None
+					height: app.Sizes['normal_line']

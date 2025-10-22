@@ -1,0 +1,36 @@
+<HistoryScreen>:
+	canvas.before:
+		Color:
+			rgba: app.Colors['background']
+		Rectangle:
+			pos: self.pos
+			size: self.size
+						
+	BoxLayout:
+		orientation: 'vertical'
+		spacing: 20
+		padding: 10
+		
+		NavBar:
+			MyLabel:
+				text: "[b]Workout History[/b]"
+				padding: (0, dp(18), 0, dp(10))
+				color: app.Colors['secondary']
+			MyDropDown:
+				id: navigation
+				text: "navigation"
+				ddwidth: dp(130)
+				values: ("Current Session", "Start Workout")
+				on_select: root.page_select(*args)
+								
+		RecycleView:
+			viewclass: 'WorkoutSummary'
+			data: root.data
+			RecycleBoxLayout:
+				orientation: 'vertical'
+				spacing: 20
+				padding: 10
+				size_hint_y: None
+				height: self.minimum_height
+				default_size: None, None
+				default_size_hint: 1, None
