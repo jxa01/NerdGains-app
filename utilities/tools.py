@@ -9,7 +9,7 @@ class TableTools():
 	#returns a row from the sessions table with a given session_id
 	def get_sessions(self, session_id):
 		row = db.query('sessions', where='session_id = ?', params=(session_id,))
-		return row
+		return row[0]
 		
 	#pulls all sets corrisponding to a given session_id
 	def get_sets(self, session_id):
@@ -70,7 +70,7 @@ class TableTools():
 	
 	#adds a new row to a table	
 	def new_row(self, table_name, data):
-		db.write_new_data(table_name, data)
+		return db.write_new_data(table_name, data)
 	
 	#updates the data within existing rows			
 	def update_data(self, table_name, data, where, where_params):
@@ -116,7 +116,7 @@ class TableTools():
 		
 #db = DbManager()	
 # tt = TableTools()
-
+# print(tt.get_sessions(1))
 # log_lookup = tt.log_lookup(2)
 # sets_data = log_lookup[0]
 # smvs_data = log_lookup[1]

@@ -18,24 +18,22 @@ class WorkoutSummary(BoxLayout):
 	intensity = StringProperty("")
 	
 	def on_session_id(self, instance, value):
-		#generate sessions derived  data
+		#generate sessions derived data
 		session_data = tt.get_sessions(value)		
-		if not session_data:
-			start_dt = "None"
-			self.duration = "None"
-			self.workout_title = "unknown workout"
-		else:
-			start_dt = session_data[0]['start_dt']
-			#generate workout duration
-			duration_raw = session_data[0]['length']
+		start_dt = session_data['start_dt']
+		#generate workout duration
+		if session_data['length']:
+			duration_raw = session_data['length']
 			min, sec = divmod(duration_raw, 60)
 			self.duration = f"{int(min):02}:{int(sec):02}"
-			routine = session_data[0]['routine']
-			#generate workout title
-			if routine:
-				self.workout_title = f"{routine} on {start_dt}"
-			else: 
-				self.workout_title = f"Your {start_dt} workout"
+		else:
+			self.duration = "No duration data"
+		#generate workout title
+		routine = session_data['routine']
+		if routine:
+			self.workout_title = f"{routine} on {start_dt}"
+		else: 
+			self.workout_title = f"Your {start_dt} workout"
 				
 		#generate set_metric_values specific data
 		smvs_data = tt.get_smvs(value)

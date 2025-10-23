@@ -7,7 +7,7 @@ from utilities.reference_manager import ReferenceManager
 from widgets.exercise_logger import ExerciseLog, LogRow	
 from debug import log, exc
 		
-class SessionManager:	
+class SessionManager:
 	def __init__(self):
 		self.table_tools = TableTools()
 		self.ng_config = NG_Config()
@@ -43,7 +43,6 @@ class SessionManager:
 		metric1, metric2, metric3 = (exercise_info[1] + ['','',''])[:3]	
 		exe_log = ExerciseLog(metric1, metric2, metric3, exe_id=exercise_info[0]['exe_id'], exe_log_id=exercise_info[2], submit_row_callback=self.submit_row)	
 		exe_log.exercise_name = exercise_info[0]['exe_name']
-		print(f"adding submit_row_callback: {exe_log.submit_row_callback}")
 		exe_log.delete_full_exercise_callback = self.delete_exercise
 		return exe_log
 	
@@ -53,13 +52,13 @@ class SessionManager:
 		new_set_id = self.table_tools.new_row('sets', sets_data)
 		return new_set_id
 	
-	#subittion callback function for the exercise log widget (needs more cleaning)
+	#subittion callback function for the exercise log widget
 	def submit_row(self, set_id, sets_data, smvs_data):
-		#update sets table  data in case set type was changed
+		self.sessions_table_data['length'] = ReferenceManager.get_logger().ids.timer.elap_time
+		self.table_tools.update_data('sessions', self.sessions_table_data, where="session_id = ?", where_params=[self.session_id])
 		self.table_tools.update_data('sets', sets_data, where="set_id = ?", where_params=[set_id])
 		#prep and submit smvs data		
 		metric_ids = {self.table_tools.met_to_met_id(metric): value for metric, value in smvs_data.items()}
-		
 		#add the set id to each row being submitted and submit them.
 		for i in metric_ids:
 			row = {'set_id': set_id, 'metric_id': i, 'value': metric_ids[i]}
@@ -74,7 +73,7 @@ class SessionManager:
 		App.get_running_app().root.get_screen('logger').ids.content_box.ids.container.remove_widget(exercise_log)
 		
 	def start_session(self):
-		self.sessions_table_data['start_dt'] = datetime.now().strftime("%x, %I:%M%p")		
+		self.sessions_table_data['start_dt'] = datetime.now().strftime("%x, %I:%M%p")
 		self.table_tools.update_data('sessions', self.sessions_table_data, where='session_id = ?', where_params=[self.session_id])
 		self.session_started = True
 		self.ng_config.start_session(self.session_id)
@@ -92,6 +91,10 @@ class SessionManager:
 		where='set_id = ?', 
 		params=[set_id])
 		self.total_set_count -= 1
+
+	def change_set_type(self, set_id, set_type):
+		sets_data = {'set_type_id': set_type}
+		self.table_tools.update_data('sets', sets_data, where="set_id = ?", where_params=[set_id])
 		
 	def finish_session(self):
 		self.table_tools.update_data(
@@ -111,28 +114,32 @@ class SessionManager:
 		self.session_id = 0
 		self.ng_config.abandon_session()
 		
-		
 	def session_recovery(self, session_id):
 		self.recovery_mode = True
 		session_lookup =  self.table_tools.session_lookup(session_id)
-		recovered_sessions_data = session_lookup[0]
-		recovered_logs_data = session_lookup[1]
+		print(session_lookup)
 		#set up local session data
-		self.recover_sessions_data(recovered_sessions_data, session_id)
+		self.recover_sessions_data(session_lookup[0][0], session_id)
 		#set up logger screen
-		self.recover_logger_screen(recovered_logs_data)
-		#look up and add in logs
-		
+		self.recover_logger_screen(session_lookup)
 		self.recovery_mode = False				
 		App.get_running_app().root.current = 'logger'
 		
-	def recover_sessions_data(self, sessions_data, session_id):
+	def recover_sessions_data(self, recovered_sessions_data, session_id):
 		self.session_id = session_id
-		self.session_started = True
-		self.sessions_table_data = sessions_data
+		self.sessions_table_data = recovered_sessions_data
 
 	#builds log widgets and adds them to logger from recovered data
-	def recover_logger_screen(self, recovered_logs_data):
+	def recover_logger_screen(self, session_lookup):
+		logger_ref = ReferenceManager.get_logger()
+		#set the timer back to the last recorded value
+		elap_time = session_lookup[0][0]['length']
+		if elap_time:
+			logger_ref.ids.timer.elap_time = elap_time
+			min, sec = divmod(elap_time, 60)
+			logger_ref.ids.timer.display.text = f"{int(min):02}:{sec:04.1f}"
+		#load in all logs, sets, and metric values
+		recovered_logs_data = session_lookup[1]
 		for recovered_log in recovered_logs_data:
 			exe_id = recovered_log['exe_id']
 			exe_info = self.table_tools.exercise_lookup(exe_id)
@@ -144,4 +151,4 @@ class SessionManager:
 				metric_values = [smv['value'] for smv in set_metric_values]	
 				row_data = [set_info['set_id'], set_info['exe_log_id'], set_info['set_type_id']] + metric_values
 				log_widget.row_recover(row_data)
-			ReferenceManager.get_logger().ids.content_box.ids.container.add_widget(log_widget)
+			logger_ref.ids.content_box.ids.container.add_widget(log_widget)

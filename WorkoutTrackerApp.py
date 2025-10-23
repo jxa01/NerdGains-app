@@ -70,7 +70,8 @@ class WorkoutTrackerApp(App):
 	'title_line': dp(45),
 	'title_font': sp(25),
 	'normal_line': dp(40),
-	'normal_font': sp(20)}
+	'normal_font': sp(20),
+	'column': dp(200)}
 	
 	def build(self):
 		sm = ScreenManager()	

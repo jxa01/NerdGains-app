@@ -15,37 +15,33 @@ class Logger(Screen):
 	session_manager = SessionManager()
 	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
-						
+
 	#this starts and finishes the workout session
 	def workout_start_or_finish(self, *args):
-		#what to do to start the session
+		#start the session
 		if not self.session_manager.session_started:
-			#call the session manager to start the workout
 			self.session_manager.start_session()
-			#call the timer to start 
 			self.ids.timer.start()
-			#change the button text to finish workout
 			self.ids.session_ctrl.values.pop()
-			self.ids.session_ctrl.values.append("Finish Workout")			
-		#what to do to finish a workout 
+			self.ids.session_ctrl.values.append("Finish Workout")
+		#finish the session
 		elif self.session_manager.sets_submitted == self.session_manager.total_set_count:
-			#stop stop watch 
 			self.ids.timer.stop()
-			#add session length to sessions data dict
 			self.session_manager.sessions_table_data['length'] = self.ids.timer.elap_time
-			#tell the session manager to finish the workout
 			self.session_manager.finish_session()
-			#reset the stopwatch
 			self.ids.timer.reset()
-			#clear out all exercises 
 			self.ids.content_box.ids.container.clear_widgets()
-			#go to the start workout screen
 			App.get_running_app().root.current = 'start_workout'
 			self.ids.session_ctrl.values.pop()
 			self.ids.session_ctrl.values.append("Start Workout")
+		#if session can't be finished
 		elif self.session_manager.session_started and self.session_manager.sets_submitted < self.session_manager.total_set_count:
 			Dialogs.error_popup("There are unsubmitted sets remaining.")
-						
+
+	def timer_button(self):
+		if not self.session_manager.session_started:
+			self.workout_start_or_finish()
+
 	def page_select(self, instance, value):
 		if value == "history":
 			App.get_running_app().root.current = 'history'
@@ -64,7 +60,7 @@ class Logger(Screen):
 		#stop stop watch 
 			self.ids.timer.stop()
 			#tell the session manager to abandon the workout
-			self.session_manager.abandon_session()
+			self.session_manager.abandon_session(self.session_manager.session_id)
 			#reset the stopwatch
 			self.ids.timer.reset()
 			#clear out all exercises 

@@ -40,11 +40,12 @@
 			orientation: 'horizontal'
 			spacing: 20
 			size_hint_y: None
-			height: self.minimum_height			
+			height: self.minimum_height
 			StopWatch:
 				id: timer
+				extra_action: root.timer_button
 				size_hint: (0.25, None)
-				height: app.Sizes['normal_line']			
+				height: app.Sizes['normal_line']
 					
 		ContentBox:
 			id: content_box

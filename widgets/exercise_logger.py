@@ -31,9 +31,10 @@ class ExerciseLog(BoxLayout):
 		self.metric2 = metric2
 		self.metric3 = metric3
 		super().__init__(**kwargs)
-		lbl1 = Label(text=self.metric1)
-		lbl2 = Label(text=self.metric2)
-		lbl3 = Label(text=self.metric3)
+		lbl_width = App.get_running_app().Sizes['column']
+		lbl1 = Label(text=self.metric1, size_hint_x=None, width=lbl_width)
+		lbl2 = Label(text=self.metric2, size_hint_x=None, width=lbl_width)
+		lbl3 = Label(text=self.metric3, size_hint_x=None, width=lbl_width)
 		if self.metric3:
 			self.ids.title_row.add_widget(lbl1)
 			self.ids.title_row.add_widget(lbl2)
@@ -45,10 +46,9 @@ class ExerciseLog(BoxLayout):
 			self.ids.title_row.add_widget(lbl1)
 		if not self.session_manager_ref.recovery_mode:
 			self.add_row(exe_log_id=self.exe_log_id)
-		print(f"log submit callback is: {self.submit_row_callback}")
 			
 	#if minimum_height of rows widget changes update height to match.	
-	def on_kv_post(self, base_widget):
+	def on_kv_post(self, instance):
 		self.ids.rows.bind(minimum_height=self.ids.rows.setter('height'))
 				 
 	#adds another row for additional sets
@@ -57,8 +57,8 @@ class ExerciseLog(BoxLayout):
 		self.set_count += 1
 		set_id = self.session_manager_ref.set_builder(exe_log_id, self.set_count)
 		row = LogRow(self.metric1, self.metric2, self.metric3, set_id, exe_log_id)
+		row.update_labels_callback= self.update_labels
 		row.set_count = self.set_count
-		row.delete_full_exercise_callback = self.delete_row
 		row.submit_row_callback = self.submit_row_callback
 		#add the widget to the layout		
 		self.ids.rows.add_widget(row)
@@ -70,20 +70,21 @@ class ExerciseLog(BoxLayout):
 		self.set_count += 1
 		#make the LogRow
 		row = LogRow(self.metric1, self.metric2, self.metric3, set_id, exe_log_id)
-		set_type_text = self.tt.map_set_type(set_type)
-		row.ids.set_type.text = set_type_text
+		row.update_labels_callback= self.update_labels
+		row.set_type_update("", self.tt.map_set_type(set_type))
 		row.set_count = self.set_count
-		row.delete_full_exercise_callback = self.delete_row
 		row.submit_row_callback = self.submit_row_callback
 		#add the widget to the layout		
 		self.ids.rows.add_widget(row)
 		#fill in the metric inputs with the recovered smvs if any we're given.
 		metric_values = row_data[3:6]
-		for input_field, value in zip(row.ids.metric_inputs.children, metric_values):
-			input_field.text = str(value)
-			input_field.disabled=True
-		row.ids.set_type.disabled=True	
-		row.ids.submit_button.state = 'down'
+		metric_value_inputs = list(reversed(row.ids.metric_inputs.children))
+		if metric_values:
+			for input_field, value in zip(metric_value_inputs, metric_values):
+				input_field.text = str(value)
+				input_field.disabled=True
+			row.ids.set_type.disabled=True
+			row.ids.submit_button.state = 'down'
 
 	#deletes only the last added row. 
 	def delete_row(self):
@@ -101,6 +102,12 @@ class ExerciseLog(BoxLayout):
 		if value == "Delete Excercise":
 			self.request_delete()
 
+	def update_labels(self, instance, label):
+		if label:
+			self.ids.title_row.add_widget(label)
+		else:
+			self.ids.title_row.remove_widget(self.ids.title_row.children[0])
+
 #______a row to log an  individual set________
 class LogRow(BoxLayout):
 	set_count = NumericProperty(0)
@@ -108,19 +115,20 @@ class LogRow(BoxLayout):
 	metric2_data = NumericProperty(0)
 	metric3_data = NumericProperty(0)
 	submit_row_callback = ObjectProperty(None)
+	update_labels_callback = ObjectProperty(None)
 	
 	def __init__(self, metric1, metric2, metric3, set_id, exe_log_id, **kwargs):
 		self.session_manager_ref = ReferenceManager.get_session_manager()
-		self.tt = TableTools()		
+		self.tt = TableTools()
 		self.set_id = set_id
 		self.exe_log_id = exe_log_id
 		self.set_type = 1
-		self.metric1 = metric1		
+		self.metric1 = metric1
 		self.metric2 = metric2
 		self.metric3 = metric3
-		super().__init__(**kwargs)		
+		super().__init__(**kwargs)
 		metric_input = Metric(metric=self.metric1, hint_text=self.metric1)
-		metric_input.data_input = self.metric_data_input			
+		metric_input.data_input = self.metric_data_input
 		self.ids.metric_inputs.add_widget(metric_input)
 		#if metric2 is set
 		if self.metric2:
@@ -136,7 +144,6 @@ class LogRow(BoxLayout):
 			metric_input = Metric(metric=self.metric3, hint_text=self.metric3)
 			metric_input.data_input = self.metric_data_input			
 			self.ids.metric_inputs.add_widget(metric_input)
-		print(f"row submit callback is {self.submit_row_callback}")
 								
 	def set_type_update(self, instance, value):
 		self.set_type = self.tt.map_set_type(value)
@@ -145,14 +152,19 @@ class LogRow(BoxLayout):
 		if value != "RIR" and self.metric3 == "RIR":
 			self.ids.metric_inputs.remove_widget(self.ids.metric_inputs.children[0])
 			self.metric3 = ''
-			self.parent.parent.ids.title_row.remove_widget(self.parent.parent.ids.title_row.children[0])
+			self.update_labels_callback("", "")
+			#self.parent.parent.ids.title_row.remove_widget(self.parent.parent.ids.title_row.children[0])
 		if value == "RIR" and not self.metric3:
+			#make the metric_input
 			self.metric3 = "RIR"
 			metric_input = Metric(metric=self.metric3, hint_text=self.metric3)
 			metric_input.data_input = self.metric_data_input
-			lbl3 = Label(text="RIR")
-			self.parent.parent.ids.title_row.add_widget(lbl3)			
 			self.ids.metric_inputs.add_widget(metric_input)
+			self.session_manager_ref.change_set_type(self.set_id, self.set_type)
+			#make the label
+			lbl_width = App.get_running_app().Sizes['column']
+			lbl3 = Label(text="RIR", size_hint_x=None, width=lbl_width)
+			self.update_labels_callback("", lbl3)
 				
 	def metric_data_input(self, metric, value):
 		if value:
@@ -181,16 +193,13 @@ class LogRow(BoxLayout):
 		else:
 			self.unsubmit_row()
 
-
 	#what to do when the submit button gets hit for a log row.
 	def submit_row(self):
-		print("submit row running")
 		#check if the session has been started and start it if needed.
 		if not self.session_manager_ref.session_started:
 			ReferenceManager.get_logger().workout_start_or_finish()			
 		#if on_submit call back is set gather set data and smvs data and send it to the session manager object (session_manager).
 		if self.submit_row_callback:
-			print("calling back")				
 			sets_data = {'set_type_id': self.set_type, 'set_number': self.set_count, 'exe_log_id': self.exe_log_id}	
 			if self.metric3:
 				smvs_data = {self.metric1: self.metric1_data, self.metric2: self.metric2_data, self.metric3: self.metric3_data}			
@@ -218,10 +227,11 @@ class Metric(TextInput):
 		self.app = App.get_running_app()
 		self.metric = metric
 		super().__init__(**kwargs)
-		self.size_hint_y = None
+		self.size_hint = (None, None)
+		self.width = self.app.Sizes['column']
 		self.height = self.app.Sizes['normal_line']
 		self.input_type = 'number'
-		self.input_filter = 'float'
+		self.input_filter ='float'
 		self.hint_text_color = self.app.Colors['disabled_text']
 		self.foreground_color = self.app.Colors['primary_text']
 		self.halign = 'center'
