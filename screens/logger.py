@@ -21,7 +21,7 @@ class Logger(Screen):
 		#start the session
 		if not self.session_manager.session_started:
 			self.session_manager.start_session()
-			self.ids.timer.start()
+			self.ids.timer.start_stop_btn_action("")
 			self.ids.session_ctrl.values.pop()
 			self.ids.session_ctrl.values.append("Finish Workout")
 		#finish the session

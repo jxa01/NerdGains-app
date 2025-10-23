@@ -27,26 +27,16 @@ class ExerciseLog(BoxLayout):
 		self.exe_id = exe_id
 		self.exe_log_id = exe_log_id
 		self.set_count = 0
-		self.metric1 = metric1
-		self.metric2 = metric2
-		self.metric3 = metric3
+		self.metric_dict = {'metric1': metric1, 'metric2': metric2, 'metric3': metric3}
 		super().__init__(**kwargs)
 		lbl_width = App.get_running_app().Sizes['column']
-		lbl1 = Label(text=self.metric1, size_hint_x=None, width=lbl_width)
-		lbl2 = Label(text=self.metric2, size_hint_x=None, width=lbl_width)
-		lbl3 = Label(text=self.metric3, size_hint_x=None, width=lbl_width)
-		if self.metric3:
-			self.ids.title_row.add_widget(lbl1)
-			self.ids.title_row.add_widget(lbl2)
-			self.ids.title_row.add_widget(lbl3)
-		elif self.metric2:
-			self.ids.title_row.add_widget(lbl1)
-			self.ids.title_row.add_widget(lbl2)
-		else:			
-			self.ids.title_row.add_widget(lbl1)
+		for i in self.metric_dict:
+			if self.metric_dict[i]:
+				lbl = Label(text=i, size_hint_x=None, width=lbl_width)
+				self.ids.title_row.add_widget(lbl)
 		if not self.session_manager_ref.recovery_mode:
 			self.add_row(exe_log_id=self.exe_log_id)
-			
+
 	#if minimum_height of rows widget changes update height to match.	
 	def on_kv_post(self, instance):
 		self.ids.rows.bind(minimum_height=self.ids.rows.setter('height'))
@@ -56,7 +46,7 @@ class ExerciseLog(BoxLayout):
 		self.session_manager_ref.total_set_count += 1
 		self.set_count += 1
 		set_id = self.session_manager_ref.set_builder(exe_log_id, self.set_count)
-		row = LogRow(self.metric1, self.metric2, self.metric3, set_id, exe_log_id)
+		row = LogRow(self.metric_dict, set_id, exe_log_id)
 		row.update_labels_callback= self.update_labels
 		row.set_count = self.set_count
 		row.submit_row_callback = self.submit_row_callback
@@ -117,15 +107,13 @@ class LogRow(BoxLayout):
 	submit_row_callback = ObjectProperty(None)
 	update_labels_callback = ObjectProperty(None)
 	
-	def __init__(self, metric1, metric2, metric3, set_id, exe_log_id, **kwargs):
+	def __init__(self, metric_dict, set_id, exe_log_id, **kwargs):
 		self.session_manager_ref = ReferenceManager.get_session_manager()
 		self.tt = TableTools()
 		self.set_id = set_id
 		self.exe_log_id = exe_log_id
 		self.set_type = 1
-		self.metric1 = metric1
-		self.metric2 = metric2
-		self.metric3 = metric3
+		self.metric1, self.metric2, self.metric3 = metric_dict
 		super().__init__(**kwargs)
 		metric_input = Metric(metric=self.metric1, hint_text=self.metric1)
 		metric_input.data_input = self.metric_data_input
